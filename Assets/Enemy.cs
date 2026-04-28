@@ -2,28 +2,29 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    [Header("移動設定")]
     public float speed = 2f;
     public float downDistance = 0.5f;
     private int direction = 1;
 
-    // ★追加：敵の弾のプレハブ
+    [Header("攻撃設定")]
     public GameObject enemyBulletPrefab;
-    // ★追加：発射間隔（秒）
     public float shotInterval = 3f;
-    // ★追加：タイマー
     private float timer;
 
     void Start()
-{
-    // 最初の発射までの時間を0からshotIntervalの間でランダムに決める
-    timer = Random.Range(0f, shotInterval);
-}
+    {
+        // 敵ごとに発射タイミングをバラつかせる
+        timer = Random.Range(0f, shotInterval);
+    }
 
     void Update()
     {
-        // 移動の処理（変更なし）
+        // 横移動
         transform.Translate(Vector2.right * direction * speed * Time.deltaTime);
-        if (transform.position.x > 8.0f || transform.position.x < -8.0f)
+
+        // 端での反転と降下
+        if (transform.position.x > 8.5f || transform.position.x < -8.5f)
         {
             direction *= -1;
             Vector3 pos = transform.position;
@@ -32,28 +33,32 @@ public class Enemy : MonoBehaviour
             transform.position += Vector3.right * direction * 0.1f;
         }
 
-        // ★追加：自動発射の処理
-        timer += Time.deltaTime; // 毎フレーム時間を足す
+        // 自動発射
+        timer += Time.deltaTime;
         if (timer > shotInterval)
         {
             Shoot();
-            timer = 0; // タイマーをリセット
+            timer = 0;
         }
     }
 
-    // ★追加：弾を撃つ関数
     void Shoot()
     {
-        Instantiate(enemyBulletPrefab, transform.position, Quaternion.identity);
+        if (enemyBulletPrefab != null)
+        {
+            Instantiate(enemyBulletPrefab, transform.position, Quaternion.identity);
+        }
     }
 
-    // 自機の弾が当たった時の処理（変更なし）
+    // ★敵に何かが当たった時の判定
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // 自機の弾（Bulletタグ）に当たった場合
         if (collision.gameObject.CompareTag("Bullet"))
         {
-            Destroy(collision.gameObject);
-            Destroy(gameObject);
+            Debug.Log("敵を撃破！");
+            Destroy(collision.gameObject); // 当たった自機の弾を消す
+            Destroy(gameObject);           // 自分（敵）を消す
         }
     }
 }
