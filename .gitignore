@@ -2,6 +2,12 @@
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore
 #
+
+# macOS
+.DS_Store
+
+# Visual Studio 2022+ solution file
+*.slnx
 .utmp/
 /[Ll]ibrary/
 /[Tt]emp/
