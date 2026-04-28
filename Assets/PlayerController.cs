@@ -2,43 +2,73 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 5f;
-    // ★追加：弾の設計図（プレハブ）を格納する変数
+    [Header("移動設定")]
+    public float speed = 8f;
+    public float xLimit = 8.5f;
+
+    [Header("発射設定")]
     public GameObject bulletPrefab;
+    public float shotInterval = 0.5f;
+    private float timer = 0f;
+
+    [Header("残機設定")]
+    public int lives = 3; // ★初期の残機
+    private Vector3 startPosition; // ★復活する場所
+
+    void Start()
+    {
+        // 最初にいた場所を覚えておく
+        startPosition = transform.position;
+    }
 
     void Update()
     {
-        // 左右の移動
+        // --- 移動・発射の処理（変更なし） ---
         float move = Input.GetAxis("Horizontal");
         transform.Translate(Vector2.right * move * speed * Time.deltaTime);
 
-        // ★追加：スペースキーが押されたら弾を生成する
-        if (Input.GetKeyDown(KeyCode.Space))
+        float xPos = Mathf.Clamp(transform.position.x, -xLimit, xLimit);
+        transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
+
+        timer += Time.deltaTime;
+        if (Input.GetKeyDown(KeyCode.Space) && timer >= shotInterval)
         {
             Shoot();
+            timer = 0f;
         }
     }
 
     void Shoot()
     {
-        // Instantiate（インスタンシエイト）は、オブジェクトの実体を作る関数です
-        // 第1引数：作るもの（弾のプレハブ）
-        // 第2引数：場所（今の自分の位置）
-        // 第3引数：回転（そのまま）
         Instantiate(bulletPrefab, transform.position, Quaternion.identity);
     }
-    // ★追加：敵の弾が当たった時の処理
+
+    // ★当たり判定の改造
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 当たった相手のタグが「EnemyBullet」だったら
         if (collision.gameObject.CompareTag("EnemyBullet"))
         {
-            Debug.Log("ゲームオーバー！"); // コンソールに文字を出す
             Destroy(collision.gameObject); // 敵の弾を消す
-            Destroy(gameObject);           // 自分（自機）を消す
+            PlayerDamaged(); // ★ダメージ処理へ
+        }
+    }
 
-            // 本来はここに「ゲームオーバー画面」を出す処理などを書きます
-            // 今回はとりあえず自機が消えるところまで実装します
+    void PlayerDamaged()
+    {
+        lives--; // 残機を1減らす
+        Debug.Log("残り残機: " + lives);
+
+        if (lives > 0)
+        {
+            // まだ残機があるなら、初期位置に戻る
+            transform.position = startPosition;
+            // ここに「少しの間、点滅して無敵になる」などの処理を入れるとより本格的です
+        }
+        else
+        {
+            // 残機がなくなったら消滅
+            Debug.Log("ゲームオーバー...");
+            Destroy(gameObject);
         }
     }
 }
