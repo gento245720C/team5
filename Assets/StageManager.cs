@@ -21,7 +21,7 @@ public class StageManager : MonoBehaviour
         cleared = true;
 
         if (clearPanel != null) clearPanel.SetActive(true);
-        if (clearText != null) clearText.text = "クリア！";
+        if (clearText != null) clearText.text = "CLEAR!!";
 
         Time.timeScale = 0f;
     }
