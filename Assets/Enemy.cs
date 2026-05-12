@@ -38,6 +38,7 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
+        InitializeEnemy();
         // 敵ごとに発射タイミングをバラつかせる
         timer = Random.Range(0f, shotInterval);
     }
