@@ -2,11 +2,14 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [Header("基本設定")]
+    [Header("移動設定")]
     public float speed = 2f;
     public float descentSpeed = 0.5f;
     private int direction = 1;
+
+    [Header("攻撃設定")]
     public GameObject enemyBulletPrefab;
+    public float shotInterval = 3f;
     private float timer;
 
     [Header("弾の設定")]
@@ -35,15 +38,18 @@ public class Enemy : MonoBehaviour
 
     void Start()
     {
-        InitializeEnemy();
+        // 敵ごとに発射タイミングをバラつかせる
+        timer = Random.Range(0f, shotInterval);
     }
 
     void Update()
     {
+        // 1. 移動処理
         float xMove = direction * speed * Time.deltaTime;
         float yMove = -descentSpeed * Time.deltaTime;
         transform.Translate(new Vector3(xMove, yMove, 0));
-        
+
+        // 2. 端での反転処理
         if (transform.position.x > currentMoveXRange)
         {
             direction = -1;
@@ -55,13 +61,19 @@ public class Enemy : MonoBehaviour
             transform.position = new Vector3(-currentMoveXRange, transform.position.y, 0);
         }
 
-        if (transform.position.y < -5.5f) { Destroy(gameObject); }
+        // 3. 画面下部での消滅処理
+        if (transform.position.y < -5.5f) 
+        { 
+            Destroy(gameObject); 
+        }
 
+        // 4. 射撃処理
         timer += Time.deltaTime;
         if (timer > currentShotInterval)
         {
             Shoot();
             timer = 0;
+            // 次の射撃間隔をランダムに設定
             currentShotInterval = Random.Range(minShotInterval, maxShotInterval);
         }
     }
@@ -92,7 +104,7 @@ public class Enemy : MonoBehaviour
 
         // 弾の設定をランダムに決める
         currentBulletSpeed = Random.Range(minBulletSpeed, maxBulletSpeed);
-        currentBulletScale = Random.Range(minBulletScale, maxBulletScale); // ★ここ
+        currentBulletScale = Random.Range(minBulletScale, maxBulletScale);
         currentShotInterval = Random.Range(minShotInterval, maxShotInterval);
         
         speed = Random.Range(1f, 4f);
@@ -103,10 +115,12 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // 自機の弾（Bulletタグ）に当たった場合
         if (collision.gameObject.CompareTag("Bullet"))
         {
-            Destroy(collision.gameObject);
-            Destroy(gameObject);
+            Debug.Log("敵を撃破！");
+            Destroy(collision.gameObject); // 当たった自機の弾を消す
+            Destroy(gameObject);           // 自分（敵）を消す
         }
     }
 }

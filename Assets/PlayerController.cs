@@ -2,39 +2,41 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed = 5f;
-    public GameObject bulletPrefab;
+    [Header("移動設定")]
+    public float speed = 8f;
+    public float xLimit = 8.5f;
 
-    // 画面の移動制限（この数値を調整して止まる位置を決めます）
-    public float xMin = -2.5f;
-    public float xMax = 2.5f;
-    public float yMin = -4f;
-    public float yMax = 2.5f;
+    [Header("発射設定")]
+    public GameObject bulletPrefab;
+    public float shotInterval = 0.5f;
+    private float timer = 0f;
+
+    [Header("残機設定")]
+    public int lives = 3; // ★初期の残機
+    private Vector3 startPosition; // ★復活する場所
+
+    void Start()
+    {
+        // 最初にいた場所を覚えておく
+        startPosition = transform.position;
+    }
 
     void Update()
     {
-        // --- 移動の処理 ---
-        float moveX = Input.GetAxis("Horizontal");
-        float moveY = Input.GetAxis("Vertical");
+        // 移動処理
+        float move = Input.GetAxis("Horizontal");
+        transform.Translate(Vector2.right * move * speed * Time.deltaTime);
 
-        Vector2 moveDir = new Vector2(moveX, moveY);
-        transform.Translate(moveDir * speed * Time.deltaTime);
+        // 画面端の制限
+        float xPos = Mathf.Clamp(transform.position.x, -xLimit, xLimit);
+        transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
 
-        // ★追加：画面外に出ないように座標を制限する処理
-        Vector3 pos = transform.position; // 現在の位置を取得
-
-        // x座標を xMin から xMax の間に収める
-        pos.x = Mathf.Clamp(pos.x, xMin, xMax);
-        // y座標を yMin から yMax の間に収める
-        pos.y = Mathf.Clamp(pos.y, yMin, yMax);
-
-        transform.position = pos; // 制限した後の座標を自分に反映
-
-
-        // --- 発射の処理 ---
-        if (Input.GetKeyDown(KeyCode.Space))
+        // 発射処理
+        timer += Time.deltaTime;
+        if (Input.GetKeyDown(KeyCode.Space) && timer >= shotInterval)
         {
             Shoot();
+            timer = 0f;
         }
     }
 
@@ -47,8 +49,25 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("EnemyBullet"))
         {
-            Debug.Log("ゲームオーバー！");
-            Destroy(collision.gameObject);
+            Destroy(collision.gameObject); // 敵の弾を消す
+            PlayerDamaged(); // ★ダメージ処理へ
+        }
+    }
+
+    void PlayerDamaged()
+    {
+        lives--; // 残機を1減らす
+        Debug.Log("残り残機: " + lives);
+
+        if (lives > 0)
+        {
+            // まだ残機があるなら、初期位置に戻る
+            transform.position = startPosition;
+        }
+        else
+        {
+            // 残機がなくなったら消滅
+            Debug.Log("ゲームオーバー...");
             Destroy(gameObject);
         }
     }
