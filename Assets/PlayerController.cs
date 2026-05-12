@@ -5,6 +5,9 @@ public class PlayerController : MonoBehaviour
     [Header("移動設定")]
     public float speed = 8f;
     public float xLimit = 8.5f;
+    // ★新しく縦の制限を追加（画面サイズに合わせて後で調整できます）
+    public float yMin = -4.5f; // 下の限界
+    public float yMax = 4.5f;  // 上の限界
 
     [Header("発射設定")]
     public GameObject bulletPrefab;
@@ -23,13 +26,21 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // --- 移動・発射の処理（変更なし） ---
-        float move = Input.GetAxis("Horizontal");
-        transform.Translate(Vector2.right * move * speed * Time.deltaTime);
+        // ★横と縦の入力受け取り
+        float moveX = Input.GetAxis("Horizontal"); // 左右（A/Dキー、←/→キー）
+        float moveY = Input.GetAxis("Vertical");   // 上下（W/Sキー、↑/↓キー）
 
+        // 移動処理（XとY両方に動きを適用）
+        transform.Translate(new Vector2(moveX, moveY) * speed * Time.deltaTime);
+
+        // ★画面端の制限（X軸とY軸両方にはみ出さないように計算）
         float xPos = Mathf.Clamp(transform.position.x, -xLimit, xLimit);
-        transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
+        float yPos = Mathf.Clamp(transform.position.y, yMin, yMax);
+        
+        // 計算した結果の座標を適用
+        transform.position = new Vector3(xPos, yPos, transform.position.z);
 
+        // 発射処理
         timer += Time.deltaTime;
         if (Input.GetKeyDown(KeyCode.Space) && timer >= shotInterval)
         {
@@ -43,7 +54,6 @@ public class PlayerController : MonoBehaviour
         Instantiate(bulletPrefab, transform.position, Quaternion.identity);
     }
 
-    // ★当たり判定の改造
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("EnemyBullet"))
@@ -62,7 +72,6 @@ public class PlayerController : MonoBehaviour
         {
             // まだ残機があるなら、初期位置に戻る
             transform.position = startPosition;
-            // ここに「少しの間、点滅して無敵になる」などの処理を入れるとより本格的です
         }
         else
         {
