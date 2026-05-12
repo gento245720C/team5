@@ -5,6 +5,9 @@ public class PlayerController : MonoBehaviour
     [Header("移動設定")]
     public float speed = 8f;
     public float xLimit = 8.5f;
+    // ★新しく縦の制限を追加（画面サイズに合わせて後で調整できます）
+    public float yMin = -4.5f; // 下の限界
+    public float yMax = 4.5f;  // 上の限界
 
     [Header("発射設定")]
     public GameObject bulletPrefab;
@@ -23,13 +26,19 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // 移動処理
-        float move = Input.GetAxis("Horizontal");
-        transform.Translate(Vector2.right * move * speed * Time.deltaTime);
+        // ★横と縦の入力受け取り
+        float moveX = Input.GetAxis("Horizontal"); // 左右（A/Dキー、←/→キー）
+        float moveY = Input.GetAxis("Vertical");   // 上下（W/Sキー、↑/↓キー）
 
-        // 画面端の制限
+        // 移動処理（XとY両方に動きを適用）
+        transform.Translate(new Vector2(moveX, moveY) * speed * Time.deltaTime);
+
+        // ★画面端の制限（X軸とY軸両方にはみ出さないように計算）
         float xPos = Mathf.Clamp(transform.position.x, -xLimit, xLimit);
-        transform.position = new Vector3(xPos, transform.position.y, transform.position.z);
+        float yPos = Mathf.Clamp(transform.position.y, yMin, yMax);
+        
+        // 計算した結果の座標を適用
+        transform.position = new Vector3(xPos, yPos, transform.position.z);
 
         // 発射処理
         timer += Time.deltaTime;
