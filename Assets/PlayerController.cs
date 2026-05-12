@@ -3,16 +3,35 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float speed = 5f;
-    // ★追加：弾の設計図（プレハブ）を格納する変数
     public GameObject bulletPrefab;
+
+    // 画面の移動制限（この数値を調整して止まる位置を決めます）
+    public float xMin = -2.5f;
+    public float xMax = 2.5f;
+    public float yMin = -4f;
+    public float yMax = 2.5f;
 
     void Update()
     {
-        // 左右の移動
-        float move = Input.GetAxis("Horizontal");
-        transform.Translate(Vector2.right * move * speed * Time.deltaTime);
+        // --- 移動の処理 ---
+        float moveX = Input.GetAxis("Horizontal");
+        float moveY = Input.GetAxis("Vertical");
 
-        // ★追加：スペースキーが押されたら弾を生成する
+        Vector2 moveDir = new Vector2(moveX, moveY);
+        transform.Translate(moveDir * speed * Time.deltaTime);
+
+        // ★追加：画面外に出ないように座標を制限する処理
+        Vector3 pos = transform.position; // 現在の位置を取得
+
+        // x座標を xMin から xMax の間に収める
+        pos.x = Mathf.Clamp(pos.x, xMin, xMax);
+        // y座標を yMin から yMax の間に収める
+        pos.y = Mathf.Clamp(pos.y, yMin, yMax);
+
+        transform.position = pos; // 制限した後の座標を自分に反映
+
+
+        // --- 発射の処理 ---
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Shoot();
@@ -21,24 +40,16 @@ public class PlayerController : MonoBehaviour
 
     void Shoot()
     {
-        // Instantiate（インスタンシエイト）は、オブジェクトの実体を作る関数です
-        // 第1引数：作るもの（弾のプレハブ）
-        // 第2引数：場所（今の自分の位置）
-        // 第3引数：回転（そのまま）
         Instantiate(bulletPrefab, transform.position, Quaternion.identity);
     }
-    // ★追加：敵の弾が当たった時の処理
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 当たった相手のタグが「EnemyBullet」だったら
         if (collision.gameObject.CompareTag("EnemyBullet"))
         {
-            Debug.Log("ゲームオーバー！"); // コンソールに文字を出す
-            Destroy(collision.gameObject); // 敵の弾を消す
-            Destroy(gameObject);           // 自分（自機）を消す
-
-            // 本来はここに「ゲームオーバー画面」を出す処理などを書きます
-            // 今回はとりあえず自機が消えるところまで実装します
+            Debug.Log("ゲームオーバー！");
+            Destroy(collision.gameObject);
+            Destroy(gameObject);
         }
     }
 }
