@@ -591,6 +591,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   xLimit: 8.5
+  yMin: -4.5
+  yMax: 4.5
   bulletPrefab: {fileID: 5339789313867460059, guid: 903b07093ae4146dba99d22133612d11, type: 3}
   shotInterval: 0.5
   lives: 3
@@ -662,7 +664,7 @@ Transform:
   m_GameObject: {fileID: 591196601}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -4, y: -4.5, z: 0}
+  m_LocalPosition: {x: 0, y: -4.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
