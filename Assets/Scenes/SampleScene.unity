@@ -256,6 +256,11 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &76200769 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 366409142096368516, guid: 7cbee88ad11c147bbaf5804fbf2375ce, type: 3}
+  m_PrefabInstance: {fileID: 435387480}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &290215538
 GameObject:
   m_ObjectHideFlags: 0
@@ -502,7 +507,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -5, y: 0}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 1, y: 1}
 --- !u!222 &412558896
@@ -567,7 +572,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 4
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -577,7 +582,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -900,7 +905,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.39, y: -0.13, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -945,6 +950,8 @@ MonoBehaviour:
   bulletPrefab: {fileID: 5339789313867460059, guid: 903b07093ae4146dba99d22133612d11, type: 3}
   shotInterval: 0.5
   lives: 3
+  invincibleDuration: 2
+  blinkInterval: 0.1
 --- !u!212 &591196603
 SpriteRenderer:
   serializedVersion: 2
@@ -1014,7 +1021,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -4.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1541,8 +1548,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
   enemyPrefab: {fileID: 5180603270067469896, guid: 756c9be093d0b439781f796d4a673afa, type: 3}
-  triangleEnemyPrefab: {fileID: 5112081579806053982, guid: e78ad4ad37e4c408fb86a9c428f7c13e, type: 3}
-  spawnInterval: 3
+  triangleEnemyPrefab: {fileID: 76200769}
+  initialSpawnInterval: 3
+  targetEnemyCount: 5
+  minSpawnInterval: 0.8
+  difficultyInterval: 15
+  spawnIntervalDecrement: 0.3
 --- !u!4 &1065536836
 Transform:
   m_ObjectHideFlags: 0
@@ -1742,7 +1753,7 @@ MonoBehaviour:
     m_Bottom: 0
   m_ChildAlignment: 0
   m_Spacing: 0
-  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0

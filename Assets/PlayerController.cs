@@ -18,10 +18,18 @@ public class PlayerController : MonoBehaviour
     public int lives = 3; // ★初期の残機
     private Vector3 startPosition; // ★復活する場所
 
+    [Header("無敵設定")]
+    public float invincibleDuration = 2f; // 無敵時間（秒）
+    public float blinkInterval = 0.1f;    // 点滅間隔（秒）
+    private bool isInvincible = false;
+    private float invincibleTimer = 0f;
+    private float blinkTimer = 0f;
+    private SpriteRenderer spriteRenderer;
+
     void Start()
     {
-        // 最初にいた場所を覚えておく
         startPosition = transform.position;
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -42,10 +50,31 @@ public class PlayerController : MonoBehaviour
 
         // 発射処理
         timer += Time.deltaTime;
-        if (Input.GetKeyDown(KeyCode.Space) && timer >= shotInterval)
+        if (Input.GetKey(KeyCode.Space) && timer >= shotInterval) // 押しっぱなしで連射
         {
             Shoot();
             timer = 0f;
+        }
+
+        // 無敵時間の処理
+        if (isInvincible)
+        {
+            invincibleTimer -= Time.deltaTime;
+            blinkTimer -= Time.deltaTime;
+
+            if (blinkTimer <= 0f)
+            {
+                blinkTimer = blinkInterval;
+                if (spriteRenderer != null)
+                    spriteRenderer.enabled = !spriteRenderer.enabled;
+            }
+
+            if (invincibleTimer <= 0f)
+            {
+                isInvincible = false;
+                if (spriteRenderer != null)
+                    spriteRenderer.enabled = true;
+            }
         }
     }
 
@@ -58,8 +87,9 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("EnemyBullet"))
         {
-            Destroy(collision.gameObject); // 敵の弾を消す
-            PlayerDamaged(); // ★ダメージ処理へ
+            if (isInvincible) return; // 無敵中はダメージなし
+            Destroy(collision.gameObject);
+            PlayerDamaged();
         }
     }
 
@@ -71,8 +101,10 @@ public class PlayerController : MonoBehaviour
 
         if (lives > 0)
         {
-            // まだ残機があるなら、初期位置に戻る
-            transform.position = startPosition;
+            // 無敵状態を開始（その場で点滅）
+            isInvincible = true;
+            invincibleTimer = invincibleDuration;
+            blinkTimer = blinkInterval;
         }
         else
         {
