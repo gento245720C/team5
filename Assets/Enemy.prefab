@@ -108,6 +108,7 @@ MonoBehaviour:
   speed: 2
   descentSpeed: 0.5
   enemyBulletPrefab: {fileID: 9028439366270882026, guid: b27883967321e4e468e2ad2b9ebd95d6, type: 3}
+  shotInterval: 1000
   minShotInterval: 0.5
   maxShotInterval: 1
   minBulletSpeed: 0.2

@@ -107,11 +107,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   speed: 5
-  bulletPrefab: {fileID: 5339789313867460059, guid: 903b07093ae4146dba99d22133612d11, type: 3}
-  xMin: -2.5
-  xMax: 2.5
+  xLimit: 8.5
   yMin: -4.5
   yMax: 4.5
+  bulletPrefab: {fileID: 5339789313867460059, guid: 903b07093ae4146dba99d22133612d11, type: 3}
+  shotInterval: 0
+  lives: 3
 --- !u!61 &1669188442238357863
 BoxCollider2D:
   m_ObjectHideFlags: 0
