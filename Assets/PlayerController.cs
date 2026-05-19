@@ -67,6 +67,7 @@ public class PlayerController : MonoBehaviour
     {
         lives--; // 残機を1減らす
         Debug.Log("残り残機: " + lives);
+        StageManager.Instance?.UpdateHP(lives); // HP表示を更新
 
         if (lives > 0)
         {

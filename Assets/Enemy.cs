@@ -121,6 +121,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("敵を撃破！");
             Destroy(collision.gameObject); // 当たった自機の弾を消す
+            StageManager.Instance?.AddKill(); // 撃破数を通知
             Destroy(gameObject);           // 自分（敵）を消す
         }
     }
