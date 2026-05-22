@@ -120,6 +120,7 @@ MonoBehaviour:
   maxMoveXRange: 2.5
   minScale: 0.5
   maxScale: 1.5
+  scoreValue: 100
 --- !u!61 &721245782725826727
 BoxCollider2D:
   m_ObjectHideFlags: 0

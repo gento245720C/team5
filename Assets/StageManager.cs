@@ -3,6 +3,8 @@ using TMPro;
 
 public class StageManager : MonoBehaviour
 {
+    private const string HighScoreKey = "HighScore";
+
     public static StageManager Instance { get; private set; }
 
     [Header("ステージクリア")]
@@ -15,8 +17,10 @@ public class StageManager : MonoBehaviour
 
     [Header("スコア表示")]
     [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI highScoreText;
     [SerializeField] private int scorePerKill = 100;
     private int score = 0;
+    private int highScore = 0;
 
     [Header("HP表示（赤丸アイコン）")]
     [SerializeField] private GameObject[] hpCircles; // HP分の赤丸オブジェクト（3つ設定する）
@@ -30,17 +34,26 @@ public class StageManager : MonoBehaviour
 
     void Start()
     {
+        highScore = PlayerPrefs.GetInt(HighScoreKey, 0);
         UpdateKillCountUI();
         UpdateScoreUI();
+        UpdateHighScoreUI();
         UpdateHPUI(hpCircles != null ? hpCircles.Length : 3);
     }
 
     public void AddKill()
     {
+        AddKill(scorePerKill);
+    }
+
+    public void AddKill(int addedScore)
+    {
         killCount++;
-        score += scorePerKill;
+        score += addedScore;
+        UpdateHighScore();
         UpdateKillCountUI();
         UpdateScoreUI();
+        UpdateHighScoreUI();
     }
 
     public void UpdateHP(int currentLives)
@@ -69,6 +82,21 @@ public class StageManager : MonoBehaviour
     {
         if (scoreText != null)
             scoreText.text = "Score: " + score;
+    }
+
+    private void UpdateHighScore()
+    {
+        if (score <= highScore) return;
+
+        highScore = score;
+        PlayerPrefs.SetInt(HighScoreKey, highScore);
+        PlayerPrefs.Save();
+    }
+
+    private void UpdateHighScoreUI()
+    {
+        if (highScoreText != null)
+            highScoreText.text = "High Score: " + highScore;
     }
 
     private void UpdateHPUI(int currentLives)

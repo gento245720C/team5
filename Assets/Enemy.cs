@@ -35,6 +35,9 @@ public class Enemy : MonoBehaviour
     public float minScale = 0.5f;
     public float maxScale = 1.5f;
 
+    [Header("スコア設定")]
+    public int scoreValue = 100;
+
     void Start()
     {
         InitializeEnemy();
@@ -134,7 +137,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("敵を撃破！");
             Destroy(collision.gameObject); // 当たった自機の弾を消す
-            StageManager.Instance?.AddKill(); // 撃破数を通知
+            StageManager.Instance?.AddKill(scoreValue); // 撃破数とスコアを通知
             Destroy(gameObject);           // 自分（敵）を消す
         }
     }
