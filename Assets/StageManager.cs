@@ -13,6 +13,11 @@ public class StageManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI killCountText;
     private int killCount = 0;
 
+    [Header("スコア表示")]
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private int scorePerKill = 100;
+    private int score = 0;
+
     [Header("HP表示（赤丸アイコン）")]
     [SerializeField] private GameObject[] hpCircles; // HP分の赤丸オブジェクト（3つ設定する）
 
@@ -26,13 +31,16 @@ public class StageManager : MonoBehaviour
     void Start()
     {
         UpdateKillCountUI();
+        UpdateScoreUI();
         UpdateHPUI(hpCircles != null ? hpCircles.Length : 3);
     }
 
     public void AddKill()
     {
         killCount++;
+        score += scorePerKill;
         UpdateKillCountUI();
+        UpdateScoreUI();
     }
 
     public void UpdateHP(int currentLives)
@@ -55,6 +63,12 @@ public class StageManager : MonoBehaviour
     {
         if (killCountText != null)
             killCountText.text = "               Kills: " + killCount;
+    }
+
+    private void UpdateScoreUI()
+    {
+        if (scoreText != null)
+            scoreText.text = "Score: " + score;
     }
 
     private void UpdateHPUI(int currentLives)
