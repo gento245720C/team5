@@ -26,8 +26,7 @@ public class Enemy : MonoBehaviour
     private float currentBulletScale;
 
     [Header("出現・移動範囲")]
-    public float minSpawnYPos = 4.0f;
-    public float maxSpawnYPos = 6.0f;
+    public float spawnYOffset = 1.0f;  // 画面上端からさらに上にずらすオフセット（大きいほど遠くから登場）
     public float minMoveXRange = 1.0f;
     public float maxMoveXRange = 2.3f;
     private float currentMoveXRange;
@@ -68,15 +67,25 @@ public class Enemy : MonoBehaviour
             Destroy(gameObject); 
         }
 
-        // 4. 射撃処理
-        timer += Time.deltaTime;
-        if (timer > currentShotInterval)
+        // 4. 射撃処理（画面内に入ったときだけ撃つ）
+        if (IsOnScreen())
         {
-            Shoot();
-            timer = 0;
-            // 次の射撃間隔をランダムに設定
-            currentShotInterval = Random.Range(minShotInterval, maxShotInterval);
+            timer += Time.deltaTime;
+            if (timer > currentShotInterval)
+            {
+                Shoot();
+                timer = 0;
+                // 次の射撃間隔をランダムに設定
+                currentShotInterval = Random.Range(minShotInterval, maxShotInterval);
+            }
         }
+    }
+
+    bool IsOnScreen()
+    {
+        // カメラのワールド座標上の上端を取得し、敵のY座標がそれより下なら画面内と判定する
+        float cameraTop = Camera.main.transform.position.y + Camera.main.orthographicSize;
+        return transform.position.y <= cameraTop;
     }
 
     void Shoot()
@@ -95,9 +104,13 @@ public class Enemy : MonoBehaviour
 
     void InitializeEnemy()
     {
+        // カメラの実際の上端を取得して、必ず画面外から登場するようにする（カメラのY座標も考慮）
+        float cameraTop = Camera.main.transform.position.y + Camera.main.orthographicSize + spawnYOffset;
+        float cameraHalfWidth = Camera.main.orthographicSize * Camera.main.aspect;
+
         currentMoveXRange = Random.Range(minMoveXRange, maxMoveXRange);
-        float randomX = Random.Range(-currentMoveXRange, currentMoveXRange);
-        float randomY = Random.Range(minSpawnYPos, maxSpawnYPos);
+        float randomX = Random.Range(-cameraHalfWidth, cameraHalfWidth); // 画面横幅の範囲内でランダム
+        float randomY = cameraTop; // 画面上端より上から出現
         transform.position = new Vector3(randomX, randomY, 0);
 
         float randomSize = Random.Range(minScale, maxScale);
@@ -121,6 +134,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("敵を撃破！");
             Destroy(collision.gameObject); // 当たった自機の弾を消す
+            StageManager.Instance?.AddKill(); // 撃破数を通知
             Destroy(gameObject);           // 自分（敵）を消す
         }
     }

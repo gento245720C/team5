@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 721245782725826727}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -115,8 +115,7 @@ MonoBehaviour:
   maxBulletSpeed: 10
   minBulletScale: 0.2
   maxBulletScale: 0.8
-  minSpawnYPos: 3
-  maxSpawnYPos: 6
+  spawnYOffset: 1
   minMoveXRange: 1
   maxMoveXRange: 2.5
   minScale: 0.5
