@@ -4,8 +4,11 @@ public class PlayerController : MonoBehaviour
 {
     [Header("移動設定")]
     public float speed = 8f;
+    public bool useCameraBounds = true;
+    public float screenPadding = 0.2f;
+
+    [Header("手動移動制限")]
     public float xLimit = 8.5f;
-    // ★新しく縦の制限を追加（画面サイズに合わせて後で調整できます）
     public float yMin = -4.5f; // 下の限界
     public float yMax = 4.5f;  // 上の限界
 
@@ -25,11 +28,15 @@ public class PlayerController : MonoBehaviour
     private float invincibleTimer = 0f;
     private float blinkTimer = 0f;
     private SpriteRenderer spriteRenderer;
+    private Camera mainCamera;
+    private Vector3 playerExtents;
 
     void Start()
     {
         startPosition = transform.position;
         spriteRenderer = GetComponent<SpriteRenderer>();
+        mainCamera = Camera.main;
+        playerExtents = spriteRenderer != null ? spriteRenderer.bounds.extents : Vector3.zero;
     }
 
     void Update()
@@ -41,12 +48,7 @@ public class PlayerController : MonoBehaviour
         // 移動処理（XとY両方に動きを適用）
         transform.Translate(new Vector2(moveX, moveY) * speed * Time.deltaTime);
 
-        // ★画面端の制限（X軸とY軸両方にはみ出さないように計算）
-        float xPos = Mathf.Clamp(transform.position.x, -xLimit, xLimit);
-        float yPos = Mathf.Clamp(transform.position.y, yMin, yMax);
-        
-        // 計算した結果の座標を適用
-        transform.position = new Vector3(xPos, yPos, transform.position.z);
+        ClampPosition();
 
         // 発射処理
         timer += Time.deltaTime;
@@ -81,6 +83,45 @@ public class PlayerController : MonoBehaviour
     void Shoot()
     {
         Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+    }
+
+    void ClampPosition()
+    {
+        if (mainCamera == null)
+            mainCamera = Camera.main;
+
+        if (useCameraBounds && mainCamera != null)
+        {
+            float cameraHalfHeight = mainCamera.orthographicSize;
+            float cameraHalfWidth = cameraHalfHeight * mainCamera.aspect;
+            Vector3 cameraPosition = mainCamera.transform.position;
+
+            float minX = cameraPosition.x - cameraHalfWidth + playerExtents.x + screenPadding;
+            float maxX = cameraPosition.x + cameraHalfWidth - playerExtents.x - screenPadding;
+            float minY = cameraPosition.y - cameraHalfHeight + playerExtents.y + screenPadding;
+            float maxY = cameraPosition.y + cameraHalfHeight - playerExtents.y - screenPadding;
+
+            if (minX > maxX)
+            {
+                minX = cameraPosition.x;
+                maxX = cameraPosition.x;
+            }
+
+            if (minY > maxY)
+            {
+                minY = cameraPosition.y;
+                maxY = cameraPosition.y;
+            }
+
+            float xPos = Mathf.Clamp(transform.position.x, minX, maxX);
+            float yPos = Mathf.Clamp(transform.position.y, minY, maxY);
+            transform.position = new Vector3(xPos, yPos, transform.position.z);
+            return;
+        }
+
+        float manualXPos = Mathf.Clamp(transform.position.x, -xLimit, xLimit);
+        float manualYPos = Mathf.Clamp(transform.position.y, yMin, yMax);
+        transform.position = new Vector3(manualXPos, manualYPos, transform.position.z);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
