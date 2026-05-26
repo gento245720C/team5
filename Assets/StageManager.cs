@@ -11,14 +11,9 @@ public class StageManager : MonoBehaviour
     [SerializeField] private GameObject clearPanel;
     [SerializeField] private TextMeshProUGUI clearText;
 
-    [Header("撃破数表示")]
-    [SerializeField] private TextMeshProUGUI killCountText;
-    private int killCount = 0;
-
     [Header("スコア表示")]
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI highScoreText;
-    [SerializeField] private int scorePerKill = 100;
     private int score = 0;
     private int highScore = 0;
 
@@ -35,23 +30,15 @@ public class StageManager : MonoBehaviour
     void Start()
     {
         highScore = PlayerPrefs.GetInt(HighScoreKey, 0);
-        UpdateKillCountUI();
         UpdateScoreUI();
         UpdateHighScoreUI();
         UpdateHPUI(hpCircles != null ? hpCircles.Length : 3);
     }
 
-    public void AddKill()
+    public void AddScore(int addedScore)
     {
-        AddKill(scorePerKill);
-    }
-
-    public void AddKill(int addedScore)
-    {
-        killCount++;
         score += addedScore;
         UpdateHighScore();
-        UpdateKillCountUI();
         UpdateScoreUI();
         UpdateHighScoreUI();
     }
@@ -70,12 +57,6 @@ public class StageManager : MonoBehaviour
         if (clearText != null) clearText.text = "CLEAR!!";
 
         Time.timeScale = 0f;
-    }
-
-    private void UpdateKillCountUI()
-    {
-        if (killCountText != null)
-            killCountText.text = "               Kills: " + killCount;
     }
 
     private void UpdateScoreUI()

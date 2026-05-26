@@ -137,7 +137,7 @@ public class Enemy : MonoBehaviour
         {
             Debug.Log("敵を撃破！");
             Destroy(collision.gameObject); // 当たった自機の弾を消す
-            StageManager.Instance?.AddKill(scoreValue); // 撃破数とスコアを通知
+            StageManager.Instance?.AddScore(scoreValue); // スコアを加算
             Destroy(gameObject);           // 自分（敵）を消す
         }
     }
