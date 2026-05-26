@@ -120,6 +120,7 @@ MonoBehaviour:
   maxMoveXRange: 2.5
   minScale: 0.1
   maxScale: 0.3
+  scoreValue: 100
 --- !u!60 &-7769444758577415869
 PolygonCollider2D:
   m_ObjectHideFlags: 0

@@ -3,15 +3,19 @@ using TMPro;
 
 public class StageManager : MonoBehaviour
 {
+    private const string HighScoreKey = "HighScore";
+
     public static StageManager Instance { get; private set; }
 
     [Header("ステージクリア")]
     [SerializeField] private GameObject clearPanel;
     [SerializeField] private TextMeshProUGUI clearText;
 
-    [Header("撃破数表示")]
-    [SerializeField] private TextMeshProUGUI killCountText;
-    private int killCount = 0;
+    [Header("スコア表示")]
+    [SerializeField] private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI highScoreText;
+    private int score = 0;
+    private int highScore = 0;
 
     [Header("HP表示（赤丸アイコン）")]
     [SerializeField] private GameObject[] hpCircles; // HP分の赤丸オブジェクト（3つ設定する）
@@ -25,14 +29,18 @@ public class StageManager : MonoBehaviour
 
     void Start()
     {
-        UpdateKillCountUI();
+        highScore = PlayerPrefs.GetInt(HighScoreKey, 0);
+        UpdateScoreUI();
+        UpdateHighScoreUI();
         UpdateHPUI(hpCircles != null ? hpCircles.Length : 3);
     }
 
-    public void AddKill()
+    public void AddScore(int addedScore)
     {
-        killCount++;
-        UpdateKillCountUI();
+        score += addedScore;
+        UpdateHighScore();
+        UpdateScoreUI();
+        UpdateHighScoreUI();
     }
 
     public void UpdateHP(int currentLives)
@@ -51,10 +59,25 @@ public class StageManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
-    private void UpdateKillCountUI()
+    private void UpdateScoreUI()
     {
-        if (killCountText != null)
-            killCountText.text = "               Kills: " + killCount;
+        if (scoreText != null)
+            scoreText.text = "Score: " + score;
+    }
+
+    private void UpdateHighScore()
+    {
+        if (score <= highScore) return;
+
+        highScore = score;
+        PlayerPrefs.SetInt(HighScoreKey, highScore);
+        PlayerPrefs.Save();
+    }
+
+    private void UpdateHighScoreUI()
+    {
+        if (highScoreText != null)
+            highScoreText.text = "High Score: " + highScore;
     }
 
     private void UpdateHPUI(int currentLives)
