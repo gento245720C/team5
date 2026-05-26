@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class StageManager : MonoBehaviour
@@ -53,10 +54,12 @@ public class StageManager : MonoBehaviour
         if (cleared) return;
         cleared = true;
 
-        if (clearPanel != null) clearPanel.SetActive(true);
-        if (clearText != null) clearText.text = "CLEAR!!";
+        // スコアをクリア画面に引き渡すためPlayerPrefsに保存
+        PlayerPrefs.SetInt("ClearScore", score);
+        PlayerPrefs.Save();
 
-        Time.timeScale = 0f;
+        // クリア専用シーンへ遷移
+        SceneManager.LoadScene("Clear Game");
     }
 
     private void UpdateScoreUI()
