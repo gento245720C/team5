@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 1790134663347447470}
   - component: {fileID: 5527053379197580258}
   - component: {fileID: -3529416179094048588}
-  - component: {fileID: 4997586329884793997}
+  - component: {fileID: 770458122755479857}
   m_Layer: 0
   m_Name: Homing Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -83,10 +83,10 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 75f5f34dc1b5347e0b8351032682f224, type: 3}
+  m_Sprite: {fileID: -4548254618739980395, guid: 81471880cd3474907ae9c7c8120bad33, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
-  m_FlipY: 1
+  m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
@@ -108,20 +108,20 @@ MonoBehaviour:
   speed: 2
   descentSpeed: 0.5
   enemyBulletPrefab: {fileID: 5112081579806053982, guid: e78ad4ad37e4c408fb86a9c428f7c13e, type: 3}
+  shotInterval: 10
   minShotInterval: 1
   maxShotInterval: 3
   minBulletSpeed: 2
   maxBulletSpeed: 8
   minBulletScale: 0.2
   maxBulletScale: 0.8
-  minSpawnYPos: 4
-  maxSpawnYPos: 6
+  spawnYOffset: 1
   minMoveXRange: 1
   maxMoveXRange: 2.3
-  minScale: 0.5
-  maxScale: 1.5
---- !u!61 &4997586329884793997
-BoxCollider2D:
+  minScale: 0.15
+  maxScale: 0.3
+--- !u!60 &770458122755479857
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -154,15 +154,38 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.21133333}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.28866667}
-    oldSize: {x: 1, y: 1}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 5.01, y: 3.76}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Points:
+    m_Paths:
+    - - {x: 1.765, y: -1.62}
+      - {x: 1.805, y: -1.43}
+      - {x: 2.5049999, y: -1.39}
+      - {x: 2.5049999, y: -0.56}
+      - {x: 1.785, y: 0.14999999}
+      - {x: 1.535, y: 0.16}
+      - {x: 1.535, y: 0.88}
+      - {x: 1.045, y: 1.39}
+      - {x: 0.505, y: 1.67}
+      - {x: 0.255, y: 1.88}
+      - {x: -0.295, y: 1.88}
+      - {x: -0.525, y: 1.63}
+      - {x: -0.98499995, y: 1.39}
+      - {x: -1.255, y: 1.16}
+      - {x: -1.615, y: 0.93}
+      - {x: -1.8549999, y: -0.26}
+      - {x: -2.2849998, y: -0.35999998}
+      - {x: -2.5049999, y: -0.62}
+      - {x: -2.5049999, y: -1.36}
+      - {x: -2.475, y: -1.39}
+      - {x: -1.535, y: -1.88}
+      - {x: 1.505, y: -1.88}
+  m_UseDelaunayMesh: 1
