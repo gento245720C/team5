@@ -26,7 +26,7 @@ public class Enemy : MonoBehaviour
     private float currentBulletScale;
 
     [Header("出現・移動範囲")]
-    public float spawnYOffset = 1.0f;  // 画面上端からさらに上にずらすオフセット（大きいほど遠くから登場）
+    public float spawnYOffset = 1.0f;  
     public float minMoveXRange = 1.0f;
     public float maxMoveXRange = 2.3f;
     private float currentMoveXRange;
@@ -35,24 +35,22 @@ public class Enemy : MonoBehaviour
     public float minScale = 0.5f;
     public float maxScale = 1.5f;
 
-    [Header("スコア設定")]
-    public int scoreValue = 100;
+    [Header("サウンド設定")]
+    public AudioClip killSound;
+    [Range(0, 1)] public float killVolume = 1.0f; 
 
     void Start()
     {
         InitializeEnemy();
-        // 敵ごとに発射タイミングをバラつかせる
         timer = Random.Range(0f, shotInterval);
     }
 
     void Update()
     {
-        // 1. 移動処理
         float xMove = direction * speed * Time.deltaTime;
         float yMove = -descentSpeed * Time.deltaTime;
         transform.Translate(new Vector3(xMove, yMove, 0));
 
-        // 2. 端での反転処理
         if (transform.position.x > currentMoveXRange)
         {
             direction = -1;
@@ -64,13 +62,8 @@ public class Enemy : MonoBehaviour
             transform.position = new Vector3(-currentMoveXRange, transform.position.y, 0);
         }
 
-        // 3. 画面下部での消滅処理
-        if (transform.position.y < -5.5f) 
-        { 
-            Destroy(gameObject); 
-        }
+        if (transform.position.y < -5.5f) { Destroy(gameObject); }
 
-        // 4. 射撃処理（画面内に入ったときだけ撃つ）
         if (IsOnScreen())
         {
             timer += Time.deltaTime;
@@ -78,7 +71,6 @@ public class Enemy : MonoBehaviour
             {
                 Shoot();
                 timer = 0;
-                // 次の射撃間隔をランダムに設定
                 currentShotInterval = Random.Range(minShotInterval, maxShotInterval);
             }
         }
@@ -86,7 +78,6 @@ public class Enemy : MonoBehaviour
 
     bool IsOnScreen()
     {
-        // カメラのワールド座標上の上端を取得し、敵のY座標がそれより下なら画面内と判定する
         float cameraTop = Camera.main.transform.position.y + Camera.main.orthographicSize;
         return transform.position.y <= cameraTop;
     }
@@ -96,30 +87,24 @@ public class Enemy : MonoBehaviour
         if (enemyBulletPrefab != null)
         {
             GameObject bullet = Instantiate(enemyBulletPrefab, transform.position, Quaternion.identity);
-            
-            // ★弾の大きさをセットする
             bullet.transform.localScale = new Vector3(currentBulletScale, currentBulletScale, 1);
-
-            // 弾のスピードをセット（スクリプトが HomingBullet でも Bullet でも動くように SendMessage を使う）
             bullet.SendMessage("SetSpeed", currentBulletSpeed, SendMessageOptions.DontRequireReceiver);
         }
     }
 
     void InitializeEnemy()
     {
-        // カメラの実際の上端を取得して、必ず画面外から登場するようにする（カメラのY座標も考慮）
         float cameraTop = Camera.main.transform.position.y + Camera.main.orthographicSize + spawnYOffset;
         float cameraHalfWidth = Camera.main.orthographicSize * Camera.main.aspect;
 
         currentMoveXRange = Random.Range(minMoveXRange, maxMoveXRange);
-        float randomX = Random.Range(-cameraHalfWidth, cameraHalfWidth); // 画面横幅の範囲内でランダム
-        float randomY = cameraTop; // 画面上端より上から出現
+        float randomX = Random.Range(-cameraHalfWidth, cameraHalfWidth);
+        float randomY = cameraTop;
         transform.position = new Vector3(randomX, randomY, 0);
 
         float randomSize = Random.Range(minScale, maxScale);
         transform.localScale = new Vector3(randomSize, randomSize, 1);
 
-        // 弾の設定をランダムに決める
         currentBulletSpeed = Random.Range(minBulletSpeed, maxBulletSpeed);
         currentBulletScale = Random.Range(minBulletScale, maxBulletScale);
         currentShotInterval = Random.Range(minShotInterval, maxShotInterval);
@@ -132,13 +117,19 @@ public class Enemy : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 自機の弾（Bulletタグ）に当たった場合
         if (collision.gameObject.CompareTag("Bullet"))
         {
+            // 修正ポイント：StageManagerに依頼して音を鳴らす
+            // PlayOneShot形式なので、大量に倒しても音が消えなくなります
+            if (killSound != null && StageManager.Instance != null)
+            {
+                StageManager.Instance.PlaySE(killSound, killVolume);
+            }
+
             Debug.Log("敵を撃破！");
-            Destroy(collision.gameObject); // 当たった自機の弾を消す
-            StageManager.Instance?.AddScore(scoreValue); // スコアを加算
-            Destroy(gameObject);           // 自分（敵）を消す
+            Destroy(collision.gameObject);
+            StageManager.Instance?.AddKill();
+            Destroy(gameObject);
         }
     }
 }
