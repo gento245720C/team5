@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -27,15 +28,33 @@ public class PlayerController : MonoBehaviour
     private float blinkTimer = 0f;
     private SpriteRenderer spriteRenderer;
 
+    [Header("サウンド設定")]
+    public AudioClip shotSound;
+    public AudioClip damageSound;
+    public AudioClip explosionSound;
+    private AudioSource audioSource;
+
+    [Header("音量調整 (0.0〜1.0)")]
+    [Range(0, 1)] public float shotVolume = 0.3f;
+    [Range(0, 1)] public float damageVolume = 0.8f;
+    [Range(0, 1)] public float explosionVolume = 1.0f;
+
+    [Header("ゲームオーバー演出")]
+    public float gameOverDelay = 1.5f; 
+
     void Start()
     {
         startPosition = transform.position;
         spriteRenderer = GetComponent<SpriteRenderer>();
+        audioSource = GetComponent<AudioSource>();
         UpdateLifeUI(); 
     }
 
     void Update()
     {
+        // 死亡演出中（無効化中）は移動や射撃をさせない
+        if (!spriteRenderer.enabled && lives <= 0) return;
+
         float moveX = Input.GetAxis("Horizontal");
         float moveY = Input.GetAxis("Vertical");
         transform.Translate(new Vector2(moveX, moveY) * speed * Time.deltaTime);
@@ -68,8 +87,16 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Shoot() { 
-        if (bulletPrefab != null) Instantiate(bulletPrefab, transform.position, Quaternion.identity); 
+    void Shoot() 
+    { 
+        if (bulletPrefab != null) 
+        {
+            Instantiate(bulletPrefab, transform.position, Quaternion.identity); 
+            if (shotSound != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(shotSound, shotVolume);
+            }
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -93,18 +120,38 @@ public class PlayerController : MonoBehaviour
 
         if (lives > 0)
         {
+            if (damageSound != null && audioSource != null)
+                audioSource.PlayOneShot(damageSound, damageVolume);
+
             isInvincible = true;
             invincibleTimer = invincibleDuration;
             blinkTimer = blinkInterval;
         }
         else
         {
-            // シーン名が正確に GameOverScene であることを確認してください
-            SceneManager.LoadScene("GameOverScene");
+            StartCoroutine(GameOverRoutine());
         }
     }
 
-    // ★この関数の定義がファイルから消えていたか、クラスの外に出ていたのがエラーの原因です
+    IEnumerator GameOverRoutine()
+    {
+        Debug.Log("自機爆発！");
+
+        // 1. 爆発音を鳴らす
+        if (explosionSound != null)
+            AudioSource.PlayClipAtPoint(explosionSound, Camera.main.transform.position, explosionVolume);
+
+        // 2. 自機の見た目を消し、動けないようにする
+        spriteRenderer.enabled = false;
+        isInvincible = true; // 当たり判定を実質無効化
+
+        // 3. 指定した秒数（gameOverDelay）だけ待機
+        yield return new WaitForSeconds(gameOverDelay);
+
+        // 4. シーンを切り替える
+        SceneManager.LoadScene("GameOverScene");
+    }
+
     void UpdateLifeUI()
     {
         if (lifeIcons == null) return;

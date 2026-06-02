@@ -23,13 +23,18 @@ public class StageManager : MonoBehaviour
     private int highScore = 0;
 
     [Header("HP表示（赤丸アイコン）")]
-    [SerializeField] private GameObject[] hpCircles; // HP分の赤丸オブジェクト（3つ設定する）
+    [SerializeField] private GameObject[] hpCircles; 
 
     private bool cleared;
+
+    // ★追加：SE再生用のコンポーネント
+    private AudioSource seAudioSource;
 
     void Awake()
     {
         Instance = this;
+        // ★追加：自分自身にSE専用のAudioSourceを付ける
+        seAudioSource = gameObject.AddComponent<AudioSource>();
     }
 
     void Start()
@@ -38,6 +43,21 @@ public class StageManager : MonoBehaviour
         UpdateScoreUI();
         UpdateHighScoreUI();
         UpdateHPUI(hpCircles != null ? hpCircles.Length : 3);
+    }
+
+    // 外から音を鳴らすための命令
+    // これを使うと、複数の音が重なっても打ち消し合わずに全て鳴ります
+    public void PlaySE(AudioClip clip, float volume)
+    {
+        if (clip != null && seAudioSource != null)
+        {
+            seAudioSource.PlayOneShot(clip, volume);
+        }
+    }
+
+    public void AddKill()
+    {
+        AddScore(100);
     }
 
     public void AddScore(int addedScore)
