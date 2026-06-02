@@ -35,12 +35,18 @@ public class Enemy : MonoBehaviour
     public float minScale = 0.5f;
     public float maxScale = 1.5f;
 
+    [Header("体力・スコア設定")]
+    public int maxHealth = 1;
+    public int scoreValue = 100;
+    private int currentHealth;
+
     [Header("サウンド設定")]
     public AudioClip killSound;
     [Range(0, 1)] public float killVolume = 1.0f; 
 
     void Start()
     {
+        currentHealth = maxHealth;
         InitializeEnemy();
         timer = Random.Range(0f, shotInterval);
     }
@@ -119,17 +125,28 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Bullet"))
         {
-            // 修正ポイント：StageManagerに依頼して音を鳴らす
-            // PlayOneShot形式なので、大量に倒しても音が消えなくなります
-            if (killSound != null && StageManager.Instance != null)
-            {
-                StageManager.Instance.PlaySE(killSound, killVolume);
-            }
+            Bullet bullet = collision.gameObject.GetComponent<Bullet>();
+            int damage = bullet != null ? bullet.attackPower : 1;
 
-            Debug.Log("敵を撃破！");
             Destroy(collision.gameObject);
-            StageManager.Instance?.AddKill();
-            Destroy(gameObject);
+            TakeDamage(damage);
         }
+    }
+
+    void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+
+        if (currentHealth > 0) return;
+
+        // PlayOneShot形式なので、大量に倒しても音が消えなくなります
+        if (killSound != null && StageManager.Instance != null)
+        {
+            StageManager.Instance.PlaySE(killSound, killVolume);
+        }
+
+        Debug.Log("敵を撃破！");
+        StageManager.Instance?.AddScore(scoreValue);
+        Destroy(gameObject);
     }
 }

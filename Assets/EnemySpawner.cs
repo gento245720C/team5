@@ -5,6 +5,10 @@ public class EnemySpawner : MonoBehaviour
     public GameObject enemyPrefab;         // 四角い敵のプレハブ
     public GameObject triangleEnemyPrefab; // 三角の敵のプレハブ
 
+    [Header("耐久敵設定")]
+    public GameObject tankEnemyPrefab;
+    [Range(0f, 1f)] public float tankEnemySpawnChance = 0.2f;
+
     [Header("初期スポーン設定")]
     public float initialSpawnInterval = 3.0f; // 最初の出現間隔（秒）
 
@@ -55,6 +59,12 @@ public class EnemySpawner : MonoBehaviour
 
     void SpawnEnemy()
     {
+        if (tankEnemyPrefab != null && Random.value < tankEnemySpawnChance)
+        {
+            Instantiate(tankEnemyPrefab, Vector3.zero, Quaternion.identity);
+            return;
+        }
+
         // 出す敵の種類をランダムに選ぶ（四角か三角か）
         GameObject prefabToSpawn = Random.value > 0.5f ? enemyPrefab : triangleEnemyPrefab;
 

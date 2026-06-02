@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviour
     [Header("発射設定")]
     public GameObject bulletPrefab;
     public float shotInterval = 0.5f;
+    public int attackPower = 1;
     private float timer = 0f;
 
     [Header("残機設定")]
@@ -91,7 +92,10 @@ public class PlayerController : MonoBehaviour
     { 
         if (bulletPrefab != null) 
         {
-            Instantiate(bulletPrefab, transform.position, Quaternion.identity); 
+            GameObject bulletObject = Instantiate(bulletPrefab, transform.position, Quaternion.identity);
+            Bullet bullet = bulletObject.GetComponent<Bullet>();
+            if (bullet != null) bullet.attackPower = attackPower;
+
             if (shotSound != null && audioSource != null)
             {
                 audioSource.PlayOneShot(shotSound, shotVolume);
