@@ -1,9 +1,14 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class StageManager : MonoBehaviour
 {
     private const string HighScoreKey = "HighScore";
+    private const string RankingCountKey = "RankingCount";
+    private const string RankingScoreKey = "Ranking_";
+    private const int MaxRankingCount = 5; // ランキングの最大保存件数
 
     public static StageManager Instance { get; private set; }
 
@@ -73,10 +78,39 @@ public class StageManager : MonoBehaviour
         if (cleared) return;
         cleared = true;
 
-        if (clearPanel != null) clearPanel.SetActive(true);
-        if (clearText != null) clearText.text = "CLEAR!!";
+        // スコアをクリア画面に引き渡すためPlayerPrefsに保存
+        PlayerPrefs.SetInt("ClearScore", score);
 
-        Time.timeScale = 0f;
+        // ランキングにスコアを追加して保存
+        SaveScoreToRanking(score);
+
+        // クリア専用シーンへ遷移
+        SceneManager.LoadScene("Clear Game");
+    }
+
+    // スコアを既存ランキングに追加し、上位 MaxRankingCount 件のみ保存する
+    private void SaveScoreToRanking(int newScore)
+    {
+        int count = PlayerPrefs.GetInt(RankingCountKey, 0);
+
+        // 既存スコアを読み込む
+        List<int> scores = new List<int>();
+        for (int i = 0; i < count; i++)
+            scores.Add(PlayerPrefs.GetInt(RankingScoreKey + i, 0));
+
+        // 今回のスコアを追加して降順ソート
+        scores.Add(newScore);
+        scores.Sort((a, b) => b.CompareTo(a));
+
+        // 上位 MaxRankingCount 件に絞る
+        if (scores.Count > MaxRankingCount)
+            scores.RemoveRange(MaxRankingCount, scores.Count - MaxRankingCount);
+
+        // PlayerPrefs に保存
+        PlayerPrefs.SetInt(RankingCountKey, scores.Count);
+        for (int i = 0; i < scores.Count; i++)
+            PlayerPrefs.SetInt(RankingScoreKey + i, scores[i]);
+        PlayerPrefs.Save();
     }
 
     private void UpdateScoreUI()
