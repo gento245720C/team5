@@ -11,7 +11,7 @@ public class Bullet : MonoBehaviour
         transform.Translate(Vector2.up * speed * Time.deltaTime);
 
         // 画面の外（上側）に出たら自動で消えるようにする
-        if (transform.position.y > 6.0f)
+        if (transform.position.y > 4.8f)
         {
             Destroy(gameObject);
         }

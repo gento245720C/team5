@@ -60,7 +60,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: c2e40fa84d53ccd428f640eac126b1fb, type: 2}
+  - {fileID: -876546973899608171, guid: bde135b320597544b9ac325092409f8b, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -84,7 +84,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 8596640243658272642, guid: 7b7aa674adcaa42cdaed7981ef48f235, type: 3}
-  m_Color: {r: 0.9811321, g: 0.9811321, b: 0.9811321, a: 1}
+  m_Color: {r: 0.9, g: 0.9, b: 0.9, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -109,12 +109,10 @@ MonoBehaviour:
   descentSpeed: 0.5
   enemyBulletPrefab: {fileID: 9028439366270882026, guid: b27883967321e4e468e2ad2b9ebd95d6, type: 3}
   shotInterval: 1000
-  minShotInterval: 0.5
-  maxShotInterval: 1
-  minBulletSpeed: 0.2
-  maxBulletSpeed: 10
-  minBulletScale: 0.2
-  maxBulletScale: 0.8
+  minShotInterval: 1.5
+  maxShotInterval: 1.5
+  bulletSpeed: 1
+  bulletScaleRatio: 1.4
   spawnYOffset: 1
   minMoveXRange: 1
   maxMoveXRange: 2.5
@@ -124,6 +122,7 @@ MonoBehaviour:
   scoreValue: 100
   killSound: {fileID: 8300000, guid: dbabc3d1759b14fd2aa1698cb30c7ded, type: 3}
   killVolume: 0.1
+  explosionPrefab: {fileID: 8408093115305735814, guid: a9d1d247b7e02459389c0f86d5394991, type: 3}
 --- !u!60 &-7769444758577415869
 PolygonCollider2D:
   m_ObjectHideFlags: 0
