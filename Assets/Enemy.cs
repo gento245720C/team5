@@ -37,7 +37,11 @@ public class Enemy : MonoBehaviour
 
     [Header("サウンド設定")]
     public AudioClip killSound;
-    [Range(0, 1)] public float killVolume = 1.0f; 
+    [Range(0, 1)] public float killVolume = 1.0f;
+
+    // ★追加：エフェクト設定
+    [Header("エフェクト設定")]
+    public GameObject explosionPrefab; // 爆発パーティクルのプレハブ
 
     void Start()
     {
@@ -47,6 +51,7 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        // 1. 移動処理
         float xMove = direction * speed * Time.deltaTime;
         float yMove = -descentSpeed * Time.deltaTime;
         transform.Translate(new Vector3(xMove, yMove, 0));
@@ -64,6 +69,7 @@ public class Enemy : MonoBehaviour
 
         if (transform.position.y < -5.5f) { Destroy(gameObject); }
 
+        // 2. 射撃処理
         if (IsOnScreen())
         {
             timer += Time.deltaTime;
@@ -119,17 +125,22 @@ public class Enemy : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Bullet"))
         {
-            // 修正ポイント：StageManagerに依頼して音を鳴らす
-            // PlayOneShot形式なので、大量に倒しても音が消えなくなります
+            // ★追加：爆発エフェクトを今の位置に作り出す
+            if (explosionPrefab != null)
+            {
+                Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+            }
+
+            // サウンド再生（StageManager経由）
             if (killSound != null && StageManager.Instance != null)
             {
                 StageManager.Instance.PlaySE(killSound, killVolume);
             }
 
             Debug.Log("敵を撃破！");
-            Destroy(collision.gameObject);
-            StageManager.Instance?.AddKill();
-            Destroy(gameObject);
+            Destroy(collision.gameObject); // 当たった弾を消す
+            StageManager.Instance?.AddKill(); // スコア加算
+            Destroy(gameObject); // 敵自身を消す
         }
     }
 }
