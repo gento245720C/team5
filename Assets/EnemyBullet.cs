@@ -4,6 +4,12 @@ public class EnemyBullet : MonoBehaviour
 {
     public float speed = 5f; // 下向きの速度
 
+    // Enemy.cs から SendMessage で呼ばれる：弾速を上書きする
+    public void SetSpeed(float newSpeed)
+    {
+        speed = newSpeed;
+    }
+
     void Update()
     {
         // 下方向に移動

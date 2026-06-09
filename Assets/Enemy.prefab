@@ -109,12 +109,10 @@ MonoBehaviour:
   descentSpeed: 0.5
   enemyBulletPrefab: {fileID: 9028439366270882026, guid: b27883967321e4e468e2ad2b9ebd95d6, type: 3}
   shotInterval: 1000
-  minShotInterval: 0.5
-  maxShotInterval: 1
-  minBulletSpeed: 0.2
-  maxBulletSpeed: 10
-  minBulletScale: 0.2
-  maxBulletScale: 0.5
+  minShotInterval: 1.5
+  maxShotInterval: 1.5
+  bulletSpeed: 1
+  bulletScaleRatio: 1.4
   spawnYOffset: 1
   minMoveXRange: 1
   maxMoveXRange: 2.5

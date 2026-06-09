@@ -111,10 +111,8 @@ MonoBehaviour:
   shotInterval: 10
   minShotInterval: 1
   maxShotInterval: 3
-  minBulletSpeed: 2
-  maxBulletSpeed: 8
-  minBulletScale: 0.1
-  maxBulletScale: 0.3
+  bulletSpeed: 1.5
+  bulletScaleRatio: 1
   spawnYOffset: 1
   minMoveXRange: 1
   maxMoveXRange: 2.3

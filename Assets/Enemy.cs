@@ -16,13 +16,13 @@ public class Enemy : MonoBehaviour
     public float minShotInterval = 1.0f;
     public float maxShotInterval = 3.0f;
     private float currentShotInterval;
-    public float minBulletSpeed = 2f;
-    public float maxBulletSpeed = 8f;
+    // 弾速：全敵で共通の固定値（同じ種類の敵なら同じスピード）
+    public float bulletSpeed = 3f;
     private float currentBulletSpeed;
 
     [Header("弾の大きさ設定")]
-    public float minBulletScale = 0.2f;
-    public float maxBulletScale = 0.8f;
+    // 弾サイズは敵サイズに対する比率で決定（大きい敵→大きい弾、小さい敵→小さい弾）
+    public float bulletScaleRatio = 5f;
     private float currentBulletScale;
 
     [Header("出現・移動範囲")]
@@ -111,8 +111,10 @@ public class Enemy : MonoBehaviour
         float randomSize = Random.Range(minScale, maxScale);
         transform.localScale = new Vector3(randomSize, randomSize, 1);
 
-        currentBulletSpeed = Random.Range(minBulletSpeed, maxBulletSpeed);
-        currentBulletScale = Random.Range(minBulletScale, maxBulletScale);
+        // 弾速は全敵で同じ固定値
+        currentBulletSpeed = bulletSpeed;
+        // 弾サイズは敵自身のサイズに比例（randomSize × 比率）
+        currentBulletScale = randomSize * bulletScaleRatio;
         currentShotInterval = Random.Range(minShotInterval, maxShotInterval);
         
         speed = Random.Range(1f, 4f);
