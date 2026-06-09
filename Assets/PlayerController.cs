@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("発射設定")]
     public GameObject bulletPrefab;
-    public float shotInterval = 0.5f;
+    public float shotInterval = 0.15f;
     public int attackPower = 1;
     private float timer = 0f;
 
@@ -28,6 +28,7 @@ public class PlayerController : MonoBehaviour
     private float invincibleTimer = 0f;
     private float blinkTimer = 0f;
     private SpriteRenderer spriteRenderer;
+    private Camera mainCamera;
 
     [Header("サウンド設定")]
     public AudioClip shotSound;
@@ -48,6 +49,7 @@ public class PlayerController : MonoBehaviour
         startPosition = transform.position;
         spriteRenderer = GetComponent<SpriteRenderer>();
         audioSource = GetComponent<AudioSource>();
+        mainCamera = Camera.main;
         UpdateLifeUI(); 
     }
 
@@ -56,16 +58,10 @@ public class PlayerController : MonoBehaviour
         // 死亡演出中（無効化中）は移動や射撃をさせない
         if (!spriteRenderer.enabled && lives <= 0) return;
 
-        float moveX = Input.GetAxis("Horizontal");
-        float moveY = Input.GetAxis("Vertical");
-        transform.Translate(new Vector2(moveX, moveY) * speed * Time.deltaTime);
-
-        float xPos = Mathf.Clamp(transform.position.x, -xLimit, xLimit);
-        float yPos = Mathf.Clamp(transform.position.y, yMin, yMax);
-        transform.position = new Vector3(xPos, yPos, transform.position.z);
+        MoveToMousePosition();
 
         timer += Time.deltaTime;
-        if (Input.GetKey(KeyCode.Space) && timer >= shotInterval)
+        if (Input.GetMouseButton(0) && timer >= shotInterval)
         {
             Shoot();
             timer = 0f;
@@ -88,6 +84,27 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void MoveToMousePosition()
+    {
+        if (mainCamera == null) return;
+
+        Vector3 mousePosition = Input.mousePosition;
+        if (mousePosition.x < 0f ||
+            mousePosition.x > Screen.width ||
+            mousePosition.y < 0f ||
+            mousePosition.y > Screen.height)
+        {
+            return;
+        }
+
+        Vector3 targetPosition = mainCamera.ScreenToWorldPoint(mousePosition);
+        targetPosition.x = Mathf.Clamp(targetPosition.x, -xLimit, xLimit);
+        targetPosition.y = Mathf.Clamp(targetPosition.y, yMin, yMax);
+        targetPosition.z = transform.position.z;
+
+        transform.position = targetPosition;
+    }
+
     void Shoot() 
     { 
         if (bulletPrefab != null) 
@@ -105,6 +122,13 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.GetComponent<EarthBullet>() != null)
+        {
+            Destroy(collision.gameObject);
+            StageManager.Instance?.TriggerGameOver();
+            return;
+        }
+
         if (collision.gameObject.CompareTag("EnemyBullet") || collision.gameObject.CompareTag("Enemy"))
         {
             if (isInvincible) return;

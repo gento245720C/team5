@@ -107,6 +107,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
   speed: 2
   descentSpeed: 0.5
+  minDescentSpeed: 0.8
+  maxDescentSpeed: 1.8
   enemyBulletPrefab: {fileID: 0}
   shotInterval: 4
   minShotInterval: 3

@@ -5,6 +5,8 @@ public class Enemy : MonoBehaviour
     [Header("移動設定")]
     public float speed = 2f;
     public float descentSpeed = 0.5f;
+    public float minDescentSpeed = 0.8f;
+    public float maxDescentSpeed = 1.8f;
     private int direction = 1;
 
     [Header("攻撃設定")]
@@ -52,7 +54,7 @@ public class Enemy : MonoBehaviour
     {
         currentHealth = maxHealth;
         InitializeEnemy();
-        timer = Random.Range(0f, shotInterval);
+        timer = Random.Range(0f, currentShotInterval);
     }
 
     void Update()
@@ -124,7 +126,7 @@ public class Enemy : MonoBehaviour
         currentShotInterval = Random.Range(minShotInterval, maxShotInterval);
         
         speed = Random.Range(1f, 4f);
-        descentSpeed = Random.Range(0.3f, 1.2f);
+        descentSpeed = Random.Range(minDescentSpeed, maxDescentSpeed);
         timer = 0;
         direction = (Random.value > 0.5f) ? 1 : -1;
     }
@@ -138,22 +140,6 @@ public class Enemy : MonoBehaviour
 
             Destroy(collision.gameObject);
             TakeDamage(damage);
-            // ★追加：爆発エフェクトを今の位置に作り出す
-            if (explosionPrefab != null)
-            {
-                Instantiate(explosionPrefab, transform.position, Quaternion.identity);
-            }
-
-            // サウンド再生（StageManager経由）
-            if (killSound != null && StageManager.Instance != null)
-            {
-                StageManager.Instance.PlaySE(killSound, killVolume);
-            }
-
-            Debug.Log("敵を撃破！");
-            Destroy(collision.gameObject); // 当たった弾を消す
-            StageManager.Instance?.AddKill(); // スコア加算
-            Destroy(gameObject); // 敵自身を消す
         }
     }
 
@@ -163,7 +149,11 @@ public class Enemy : MonoBehaviour
 
         if (currentHealth > 0) return;
 
-        // PlayOneShot形式なので、大量に倒しても音が消えなくなります
+        if (explosionPrefab != null)
+        {
+            Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+        }
+
         if (killSound != null && StageManager.Instance != null)
         {
             StageManager.Instance.PlaySE(killSound, killVolume);
@@ -174,4 +164,3 @@ public class Enemy : MonoBehaviour
         Destroy(gameObject);
     }
 }
-
