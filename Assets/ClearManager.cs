@@ -56,6 +56,7 @@ public class ClearManager : MonoBehaviour
     // リトライボタン用：ゲーム本編（SampleScene）へ
     public void RetryGame()
     {
+        Time.timeScale = 1f; // 時間を動かす
         SceneManager.LoadScene("SampleScene");
     }
 
